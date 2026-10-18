@@ -27,6 +27,11 @@
 <div class="boot" id="boot"><img src="icon-512.png" alt=""></div>
 
 <script>
+  // iPhone/iPad: Safari blocks Google inside another site's frame (shows "401"),
+  // and iOS already opens home-screen links full screen, so just go to the app.
+  const iOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (iOS) location.replace(APP_URL);
   const frame = document.getElementById('app');
   frame.addEventListener('load', () => document.getElementById('boot').classList.add('gone'));
   frame.src = APP_URL;
