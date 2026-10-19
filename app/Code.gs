@@ -56,6 +56,33 @@ function setup() {
   reportsFolder_();                     // creates the "Reports" folder next to the Sheet
   UrlFetchApp.getRequest;               // so Google asks for the permissions PDF reports need
   DocumentApp.getActiveDocument;
+  alignTimeZone_(ss);
+}
+
+// The Sheet and the script must use the same time zone, or dates show a day early in the Sheet.
+// Existing entries are re-written so each keeps its real date.
+function alignTimeZone_(ss) {
+  const tz = Session.getScriptTimeZone();
+  if (ss.getSpreadsheetTimeZone() !== tz) {
+    const saved = ENTRY_SHEETS.map(n => {
+      const sh = ss.getSheetByName(n), last = sh.getLastRow();
+      if (last < 2) return null;
+      const w = sh.getLastColumn();
+      return { sh, date: sh.getRange(2, 2, last - 1, 1).getValues(), at: sh.getRange(2, w, last - 1, 1).getValues(), w, rows: last - 1 };
+    });
+    ss.setSpreadsheetTimeZone(tz);
+    saved.forEach(s => {
+      if (!s) return;
+      s.sh.getRange(2, 2, s.rows, 1).setValues(s.date);
+      s.sh.getRange(2, s.w, s.rows, 1).setValues(s.at);
+    });
+    Logger.log('Sheet time zone set to ' + tz);
+  }
+  ENTRY_SHEETS.forEach(n => {
+    const sh = ss.getSheetByName(n);
+    sh.getRange('B2:B').setNumberFormat('dd/mm/yyyy');
+    sh.getRange(2, SCHEMA[n].length, Math.max(sh.getMaxRows() - 1, 1), 1).setNumberFormat('dd/mm/yyyy hh:mm');
+  });
 }
 
 /* ---------- Web app ---------- */

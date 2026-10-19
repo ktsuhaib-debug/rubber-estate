@@ -140,6 +140,9 @@ nav button.on svg{stroke-width:2.3}
 @keyframes sp{to{transform:rotate(360deg)}}
 [hidden]{display:none!important}
 .av{cursor:pointer}
+.rf{width:32px;height:32px;flex:none;border:0;border-radius:8px;background:var(--bg);color:var(--pri);display:grid;place-items:center}
+.rf svg{width:18px;height:18px}
+.rf.spin svg{animation:sp .8s linear infinite}
 
 /* login */
 .login{max-width:360px;margin:5vh auto 0}
@@ -179,6 +182,7 @@ a.btn{text-decoration:none}
   <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></symbol>
   <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></symbol>
@@ -188,6 +192,7 @@ a.btn{text-decoration:none}
   <div class="logo"><svg class="i"><use href="#i-leaf"/></svg></div>
   <h1 data-t="app">Rubber Estate</h1>
   <div class="lang"><button data-l="en">EN</button><button data-l="ml">മല</button></div>
+  <button class="rf" id="rf" hidden aria-label="Refresh"><svg class="i"><use href="#i-refresh"/></svg></button>
   <div class="av" id="av" hidden></div>
 </div>
 
@@ -425,7 +430,7 @@ en: {
   rep_lang_note:'The PDF is made in the language you are using now.',
   wa_tap:'{x} – wage statement', wa_biz:'Rubber estate – business statement',
   err_bad_range:'"From" date must be before "To" date', err_no_tapper:'Pick a tapper',
-  err_pdf_fail:'Could not create the PDF. Please try again.'
+  err_pdf_fail:'Could not create the PDF. Please try again.', refreshed:'Up to date'
 },
 ml: {
   app:'റബ്ബർ എസ്റ്റേറ്റ്', nav_home:'ഹോം', nav_tap:'ടാപ്പിംഗ്', nav_work:'പണികൾ', nav_sale:'വിൽപ്പന', nav_pay:'കൂലി', nav_set:'സെറ്റിംഗ്',
@@ -471,7 +476,7 @@ ml: {
   rep_lang_note:'ഇപ്പോൾ ഉപയോഗിക്കുന്ന ഭാഷയിൽ PDF തയ്യാറാകും.',
   wa_tap:'{x} – കൂലി സ്റ്റേറ്റ്മെന്റ്', wa_biz:'റബ്ബർ എസ്റ്റേറ്റ് – ബിസിനസ് സ്റ്റേറ്റ്മെന്റ്',
   err_bad_range:'"മുതൽ" തീയതി "വരെ" തീയതിക്ക് മുമ്പായിരിക്കണം', err_no_tapper:'ടാപ്പറെ തിരഞ്ഞെടുക്കുക',
-  err_pdf_fail:'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.'
+  err_pdf_fail:'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.', refreshed:'പുതുക്കി'
 }};
 const CATS = ['Grass cutting', 'Fertiliser', 'Weeding', 'Spraying', 'Rain guarding', 'Other'];
 const SHEET_OF = { tap: 'Tapping', work: 'Work', sale: 'Sales', pay: 'Payments' };
@@ -550,7 +555,7 @@ function boot(d, justLoggedIn) {
   $('period').value = d.today.slice(0, 7);
   if ($('splash')) $('splash').remove();
   document.querySelector('nav').hidden = false;
-  $('av').hidden = false;
+  $('av').hidden = false; $('rf').hidden = false;
   show('home');
 }
 
@@ -558,7 +563,7 @@ function showLogin() {
   if ($('splash')) $('splash').remove();
   view = 'login';
   document.querySelector('nav').hidden = true;
-  $('av').hidden = true;
+  $('av').hidden = true; $('rf').hidden = true;
   document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === 'login'));
   renderText();
   window.scrollTo(0, 0);
@@ -620,6 +625,21 @@ document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.v));
 $('av').onclick = () => { setTab = 'account'; show('set'); };
 $('period').onchange = loadDash;
+
+/* ---- refresh: reload estates, people and the current screen from the Sheet ---- */
+$('rf').onclick = async function () {
+  if (this.classList.contains('spin')) return;
+  this.classList.add('spin');
+  try {
+    applyInit(await call('init'));
+    if (view === 'home') await loadDash();
+    else if (SHEET_OF[view]) await loadList(SHEET_OF[view]);
+    else if (view === 'set' && setTab === 'users') await loadUsers();
+    else if (view === 'set' && setTab === 'estates') renderSettings(true);
+    toast(t('refreshed'));
+  } catch (e) { toast(errMsg(e), true); }
+  this.classList.remove('spin');
+};
 
 /* ---- login ---- */
 $('lBtn').onclick = async function () {
