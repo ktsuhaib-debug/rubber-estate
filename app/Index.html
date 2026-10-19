@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#1e5b3a; --pri2:#2d7a50; --soft:#e9f2ec;
+  --bg:#f4f5f3; --card:#fff; --txt:#16201a; --mut:#6b746d; --line:#e3e7e2;
+  --red:#c0392b; --amber:#d49a2a; --h:42px; --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Inter,"Noto Sans Malayalam",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);
+  font-size:14px;line-height:1.4;padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+html[lang=ml] body{font-family:"Noto Sans Malayalam",Inter,system-ui,sans-serif}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* app bar */
+.bar{position:sticky;top:0;z-index:10;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--pri);color:#fff;display:grid;place-items:center;flex:none}
+.logo svg{width:17px;height:17px}
+.bar h1{flex:1;min-width:0;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lang{display:flex;background:var(--bg);border-radius:8px;padding:2px;flex:none}
+.lang button{border:0;background:none;font-size:12px;font-weight:600;color:var(--mut);padding:5px 9px;border-radius:6px}
+.lang button.on{background:#fff;color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.av{width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--pri);font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+
+main{max-width:520px;margin:0 auto;padding:12px}
+section{display:none} section.on{display:block}
+.ttl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:2px 2px 10px}
+.ttl h2{font-size:18px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px}
+.card h3{font-size:12px;font-weight:600;color:var(--mut);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+html[lang=ml] .card h3{text-transform:none;letter-spacing:0;font-size:13px}
+
+/* form */
+.f{min-width:0;margin-bottom:10px}
+.f>label{display:block;font-size:12px;font-weight:500;color:var(--mut);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:10px}
+input,select{display:block;width:100%;min-width:0;max-width:100%;height:var(--h);padding:0 11px;font:inherit;font-size:15px;color:var(--txt);
+  background:#fff;border:1px solid var(--line);border-radius:10px;-webkit-appearance:none;appearance:none}
+input[type=date],input[type=month]{line-height:calc(var(--h) - 2px);min-height:var(--h)}
+input::-webkit-date-and-time-value{text-align:left;margin:0}
+input::-webkit-calendar-picker-indicator{opacity:.55;margin-left:0}
+select{padding-right:30px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b746d' stroke-width='2' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 10px center}
+input:focus,select:focus{outline:none;border-color:var(--pri2);box-shadow:0 0 0 3px rgba(45,122,80,.15)}
+input[readonly]{background:var(--bg);color:var(--mut)}
+input::placeholder{color:#a7aea8}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.affix{position:relative}
+.affix span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.affix input{padding-left:26px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{flex:1 1 0;min-width:0;height:36px;padding:0 10px;border:1px solid var(--line);background:#fff;border-radius:9px;
+  font-size:13px;font-weight:500;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg.chips button{flex:0 0 auto;height:32px;border-radius:16px;padding:0 12px}
+.seg button.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.sum{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--soft);color:var(--pri);border-radius:10px;padding:9px 12px;margin:2px 0 12px;font-size:13px;font-weight:500}
+.sum b{font-size:17px;font-variant-numeric:tabular-nums}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:44px;border:0;border-radius:10px;background:var(--pri);color:#fff;font-size:15px;font-weight:600}
+.btn:active{transform:scale(.99)} .btn:disabled{opacity:.55}
+.btn.ghost{background:#fff;color:var(--pri);border:1px dashed var(--pri2);margin-bottom:10px}
+.btn svg{width:18px;height:18px}
+
+/* lists */
+.li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.li:first-child{border-top:0;padding-top:0}
+.dt{width:40px;flex:none;text-align:center;background:var(--bg);border-radius:8px;padding:4px 0;line-height:1.15}
+.dt b{display:block;font-size:15px}
+.dt small{display:block;font-size:10px;color:var(--mut);white-space:nowrap;overflow:hidden}
+.li .t{flex:1;min-width:0}
+.li .t b,.li .t small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .t b{font-size:14px;font-weight:600}
+.li .t small{font-size:12px;color:var(--mut)}
+.amt{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ic{border:0;background:none;color:#a0a8a2;padding:6px;margin-right:-6px;border-radius:8px;display:grid;place-items:center}
+.ic svg{width:18px;height:18px}
+.ic:active{background:var(--bg);color:var(--red)}
+.empty{color:var(--mut);text-align:center;padding:12px;font-size:13px}
+
+/* dashboard */
+.ctl{display:flex;gap:8px;margin-bottom:10px}
+.ctl input{flex:1}
+.ctl .seg{flex:none;flex-wrap:nowrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.ctl .seg button{height:34px;border:0;flex:none;padding:0 12px}
+.hero{background:linear-gradient(135deg,#1e5b3a,#2d7a50);color:#fff;border:0}
+.hero>small{font-size:12px;opacity:.85}
+.hero .big{font-size:28px;font-weight:700;margin:2px 0 10px;font-variant-numeric:tabular-nums}
+.hero .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hero .two div{background:rgba(255,255,255,.13);border-radius:8px;padding:7px 10px;min-width:0}
+.hero .two small{font-size:11px;opacity:.85}
+.hero .two b{display:block;font-size:15px;font-variant-numeric:tabular-nums}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;min-width:0}
+.tile small{display:block;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile b{font-size:18px;font-variant-numeric:tabular-nums}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl td{padding:6px 0;border-top:1px solid var(--line)}
+.tbl tr:first-child td{border-top:0;padding-top:0}
+.tbl td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:8px}
+.tbl tr.tot td{font-weight:700;border-top:1.5px solid var(--txt);padding-top:8px}
+.neg,.neg td{color:var(--red)}
+.bars{display:flex;align-items:flex-end;gap:3px;height:110px}
+.bars .m{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center}
+.bars .p{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:1px}
+.bars i{width:42%;min-height:2px;border-radius:2px 2px 0 0}
+.bars .a{background:var(--pri2)} .bars .c{background:var(--amber)}
+.bars span{font-size:10px;color:var(--mut);margin-top:4px;max-width:100%;overflow:hidden;white-space:nowrap}
+.bars .cur span{color:var(--pri);font-weight:700}
+.lg{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:8px}
+.lg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.note{font-size:12px;color:var(--mut);padding:2px 2px 0;line-height:1.5}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.hd h3{margin:0}
+.link{border:0;background:none;color:var(--red);font-size:12px;font-weight:500;padding:4px}
+
+/* nav */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;background:#fff;border-top:1px solid var(--line);
+  padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+nav button{flex:1 1 0;min-width:0;border:0;background:none;color:var(--mut);font-size:11px;font-weight:500;padding:6px 2px;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[lang=ml] nav button{font-size:10px}
+nav button.on{color:var(--pri)}
+nav button.on svg{stroke-width:2.3}
+
+.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translate(-50%,10px);max-width:calc(100% - 32px);
+  background:#16201a;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.bad{background:var(--red)}
+.splash{display:grid;place-items:center;height:65vh;color:var(--mut);text-align:center}
+.spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 10px}
+@keyframes sp{to{transform:rotate(360deg)}}
+[hidden]{display:none!important}
+.av{cursor:pointer}
+
+/* login */
+.login{max-width:360px;margin:5vh auto 0}
+.login .mark{width:52px;height:52px;border-radius:14px;background:var(--pri);color:#fff;display:grid;place-items:center;margin:0 auto 12px}
+.login .mark svg{width:28px;height:28px}
+.login h2{text-align:center;font-size:20px;font-weight:700;margin-bottom:4px}
+.login p{text-align:center;color:var(--mut);font-size:13px;margin-bottom:14px}
+.pin{letter-spacing:.3em}
+
+/* settings */
+#setTabs{margin-bottom:10px}
+.urow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.urow:first-child{border-top:0;padding-top:0}
+.urow .t{flex:1;min-width:0}
+.urow .t b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.urow .t small{display:block;color:var(--mut);font-size:12px}
+.pill{flex:none;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--soft);color:var(--pri)}
+.pill.m{background:var(--bg);color:var(--mut)}
+.mini{flex:none;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:500;color:var(--txt)}
+.btn.sec{background:#fff;color:var(--txt);border:1px solid var(--line)}
+.btn.danger{background:#fff;color:var(--red);border:1px solid var(--line)}
+.pair{display:flex;gap:8px}
+.pair .btn{flex:1;min-width:0}
+.pair .btn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.btn{text-decoration:none}
+.btn.wa{background:#1f8f4e}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 21c0-9.5 6-16 15-16 0 9.5-6 15-15 16z"/><path d="M5 21l8.5-8.5"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="i-work" viewBox="0 0 24 24"><path d="M4 20l8.5-8.5"/><path d="M12 9l3-3 3 3-3 3z"/><path d="M15 6l2-2 3 3-2 2"/></symbol>
+  <symbol id="i-sale" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><path d="M16 15h2"/><path d="M6 6l9-3 1.5 3"/></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></symbol>
+</svg>
+
+<div class="bar">
+  <div class="logo"><svg class="i"><use href="#i-leaf"/></svg></div>
+  <h1 data-t="app">Rubber Estate</h1>
+  <div class="lang"><button data-l="en">EN</button><button data-l="ml">മല</button></div>
+  <div class="av" id="av" hidden></div>
+</div>
+
+<main>
+<div class="splash" id="splash"><div><div class="spin"></div><span>Loading…</span></div></div>
+
+<!-- LOGIN -->
+<section id="login">
+  <div class="login">
+    <div class="mark"><svg class="i"><use href="#i-leaf"/></svg></div>
+    <h2 data-t="login_title"></h2>
+    <p data-t="login_hint"></p>
+    <div class="card">
+      <div class="f"><label data-t="username"></label>
+        <input id="lUser" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+      <div class="f"><label data-t="pin"></label>
+        <input id="lPin" class="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8"></div>
+      <button class="btn" id="lBtn"><span data-t="login"></span></button>
+    </div>
+  </div>
+</section>
+
+<!-- HOME -->
+<section id="home">
+  <div class="ctl"><input type="month" id="period"><div class="seg" id="pMode"></div></div>
+  <div id="dash"></div>
+  <div class="card"><h3 data-t="reports"></h3>
+    <div class="pair">
+      <button class="btn sec" id="goRepTap"><svg class="i"><use href="#i-doc"/></svg><span data-t="rep_tap"></span></button>
+      <button class="btn sec" id="goRepBiz"><svg class="i"><use href="#i-doc"/></svg><span data-t="rep_biz"></span></button>
+    </div>
+  </div>
+</section>
+
+<!-- REPORTS -->
+<section id="rep">
+  <div class="ttl"><h2 data-t="reports"></h2></div>
+  <div class="card">
+    <div class="f"><label data-t="rep_kind"></label><div class="seg" id="rKind"></div></div>
+    <div class="f" id="rTapWrap"><label data-t="tapper"></label><select id="rTapper"></select></div>
+    <div class="f"><label data-t="period"></label><div class="seg chips" id="rQuick"></div></div>
+    <div class="g2">
+      <div class="f"><label data-t="from"></label><input type="date" id="rFrom"></div>
+      <div class="f"><label data-t="to"></label><input type="date" id="rTo"></div>
+    </div>
+    <p class="note" style="margin:-2px 2px 10px" data-t="rep_lang_note"></p>
+    <button class="btn" id="rMake"><svg class="i"><use href="#i-doc"/></svg><span data-t="make_pdf"></span></button>
+  </div>
+  <div class="card" id="rOut" hidden>
+    <h3 data-t="pdf_ready"></h3>
+    <p id="rName" style="font-weight:600;margin-bottom:10px;word-break:break-word"></p>
+    <div class="pair">
+      <a class="btn sec" id="rOpen" target="_blank" rel="noopener"><span data-t="open_pdf"></span></a>
+      <a class="btn wa" id="rWa" target="_blank" rel="noopener"><svg class="i"><use href="#i-share"/></svg><span data-t="share_wa"></span></a>
+    </div>
+  </div>
+</section>
+
+<!-- TAPPING -->
+<section id="tap">
+  <div class="ttl"><h2 data-t="tap_title"></h2></div>
+  <div class="card">
+    <div class="f"><label data-t="estate"></label><div class="seg" id="tEstate"></div></div>
+    <div class="g2">
+      <div class="f"><label data-t="date"></label><input type="date" id="tDate"></div>
+      <div class="f"><label data-t="tapper"></label><input id="tTapper"></div>
+      <div class="f"><label data-t="trees"></label><input class="num" type="number" inputmode="numeric" id="tTrees" placeholder="0"></div>
+      <div class="f"><label data-t="rate"></label><div class="affix"><span class="cur">₹</span><input class="num" type="number" step="0.01" inputmode="decimal" id="tRate"></div></div>
+      <div class="f"><label data-t="sheets"></label><input class="num" type="number" inputmode="numeric" id="tSheets" placeholder="0"></div>
+      <div class="f"><label data-t="notes"></label><input id="tNotes"></div>
+    </div>
+    <div class="sum"><span data-t="wage"></span><b id="tWage">₹0</b></div>
+    <button class="btn" id="tSave"><svg class="i"><use href="#i-check"/></svg><span data-t="save"></span></button>
+  </div>
+  <div class="card"><h3 data-t="recent"></h3><div id="list-Tapping"></div></div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="ttl"><h2 data-t="work_title"></h2></div>
+  <div class="card">
+    <div class="f"><label data-t="estate"></label><div class="seg" id="wEstate"></div></div>
+    <div class="f"><label data-t="type"></label><div class="seg chips" id="wCat"></div></div>
+    <div class="g2">
+      <div class="f"><label data-t="date"></label><input type="date" id="wDate"></div>
+      <div class="f"><label data-t="workers"></label><input id="wWorkers" data-ph="workers_ph"></div>
+    </div>
+    <div class="f"><label data-t="desc"></label><input id="wDesc" data-ph="desc_ph"></div>
+    <div class="g2">
+      <div class="f"><label data-t="labour"></label><div class="affix"><span class="cur">₹</span><input class="num" type="number" inputmode="decimal" id="wLab" placeholder="0"></div></div>
+      <div class="f"><label data-t="material"></label><div class="affix"><span class="cur">₹</span><input class="num" type="number" inputmode="decimal" id="wMat" placeholder="0"></div></div>
+    </div>
+    <div class="sum"><span data-t="total"></span><b id="wTot">₹0</b></div>
+    <button class="btn" id="wSave"><svg class="i"><use href="#i-check"/></svg><span data-t="save"></span></button>
+  </div>
+  <div class="card"><h3 data-t="recent"></h3><div id="list-Work"></div></div>
+</section>
+
+<!-- SALES -->
+<section id="sale">
+  <div class="ttl"><h2 data-t="sale_title"></h2></div>
+  <div class="card">
+    <div class="f"><label data-t="estate"></label><div class="seg" id="sEstate"></div></div>
+    <div class="g2">
+      <div class="f"><label data-t="date"></label><input type="date" id="sDate"></div>
+      <div class="f"><label data-t="sold"></label><input class="num" type="number" inputmode="numeric" id="sSheets" placeholder="0"></div>
+      <div class="f"><label data-t="kg"></label><input class="num" type="number" step="0.01" inputmode="decimal" id="sKg" placeholder="0"></div>
+      <div class="f"><label data-t="price"></label><div class="affix"><span class="cur">₹</span><input class="num" type="number" step="0.01" inputmode="decimal" id="sPrice" placeholder="0"></div></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label data-t="amount"></label><div class="affix"><span class="cur">₹</span><input class="num" type="number" inputmode="decimal" id="sAmt" placeholder="0"></div></div>
+      <div class="f"><label data-t="buyer"></label><input id="sBuyer"></div>
+    </div>
+    <button class="btn" id="sSave"><svg class="i"><use href="#i-check"/></svg><span data-t="save"></span></button>
+  </div>
+  <div class="card"><h3 data-t="recent"></h3><div id="list-Sales"></div></div>
+</section>
+
+<!-- WAGES -->
+<section id="pay">
+  <div class="ttl"><h2 data-t="pay_title"></h2></div>
+  <div class="card">
+    <div class="g2">
+      <div class="f"><label data-t="paid_to"></label><select id="pTo"></select></div>
+      <div class="f"><label data-t="date"></label><input type="date" id="pDate"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label data-t="amount"></label><div class="affix"><span class="cur">₹</span><input class="num" type="number" inputmode="decimal" id="pAmt" placeholder="0"></div></div>
+      <div class="f"><label data-t="for"></label><input id="pNote" data-ph="for_ph"></div>
+    </div>
+    <button class="btn" id="pSave"><svg class="i"><use href="#i-check"/></svg><span data-t="save"></span></button>
+    <button class="btn sec" id="pStmt" style="margin-top:8px"><svg class="i"><use href="#i-doc"/></svg><span data-t="stmt_for"></span></button>
+  </div>
+  <div class="card"><h3 data-t="recent"></h3><div id="list-Payments"></div></div>
+</section>
+
+<!-- SETTINGS -->
+<section id="set">
+  <div class="ttl"><h2 data-t="nav_set"></h2></div>
+  <div class="seg" id="setTabs"></div>
+
+  <div id="setAccount">
+    <div class="card"><div class="urow"><div class="av" id="av2"></div>
+      <div class="t"><b id="meName"></b><small id="meSub"></small></div></div></div>
+    <div class="card"><h3 data-t="change_pin"></h3>
+      <div class="g2">
+        <div class="f"><label data-t="cur_pin"></label><input id="cpOld" class="pin" type="password" inputmode="numeric" maxlength="8"></div>
+        <div class="f"><label data-t="new_pin"></label><input id="cpNew" class="pin" type="password" inputmode="numeric" maxlength="8"></div>
+      </div>
+      <button class="btn" id="cpSave"><span data-t="change_pin"></span></button>
+    </div>
+    <div class="card" id="updCard" hidden><h3 data-t="upd_title"></h3>
+      <p id="updInfo" style="margin-bottom:10px"></p>
+      <button class="btn sec" id="updCheck"><span data-t="upd_check"></span></button>
+      <div class="pair" id="updConfirm" hidden>
+        <button class="btn sec" id="updNo"><span data-t="cancel"></span></button>
+        <button class="btn" id="updYes"><span data-t="upd_now"></span></button>
+      </div>
+    </div>
+    <button class="btn danger" id="logoutBtn"><span data-t="logout"></span></button>
+  </div>
+
+  <div id="setEstates">
+    <div id="estList"></div>
+    <button class="btn ghost" id="addEst"><svg class="i"><use href="#i-plus"/></svg><span data-t="add_est"></span></button>
+    <button class="btn" id="saveEst"><svg class="i"><use href="#i-check"/></svg><span data-t="save"></span></button>
+    <p class="note" data-t="set_note" style="margin-top:10px"></p>
+  </div>
+
+  <div id="setUsers">
+    <div class="card"><div id="userList"></div></div>
+    <div class="card" id="userForm" hidden>
+      <h3 id="ufTitle"></h3>
+      <div class="g2">
+        <div class="f"><label data-t="name"></label><input id="ufName"></div>
+        <div class="f"><label data-t="username"></label><input id="ufUser" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+      </div>
+      <div class="f"><label data-t="role"></label><div class="seg" id="ufRole"></div></div>
+      <div class="f"><label id="ufPinLbl"></label><input id="ufPin" class="pin" type="password" inputmode="numeric" maxlength="8"></div>
+      <div class="pair"><button class="btn sec" id="ufCancel"><span data-t="cancel"></span></button>
+        <button class="btn" id="ufSave"><span data-t="save"></span></button></div>
+      <button class="btn danger" id="ufRemove" style="margin-top:8px"><span data-t="remove_user"></span></button>
+    </div>
+    <button class="btn ghost" id="addUser"><svg class="i"><use href="#i-plus"/></svg><span data-t="add_user"></span></button>
+  </div>
+</section>
+</main>
+
+<nav hidden>
+  <button data-v="home"><svg class="i"><use href="#i-home"/></svg><span data-t="nav_home"></span></button>
+  <button data-v="tap"><svg class="i"><use href="#i-leaf"/></svg><span data-t="nav_tap"></span></button>
+  <button data-v="work"><svg class="i"><use href="#i-work"/></svg><span data-t="nav_work"></span></button>
+  <button data-v="sale"><svg class="i"><use href="#i-sale"/></svg><span data-t="nav_sale"></span></button>
+  <button data-v="pay"><svg class="i"><use href="#i-wallet"/></svg><span data-t="nav_pay"></span></button>
+  <button data-v="set" id="navSet"><svg class="i"><use href="#i-set"/></svg><span data-t="nav_set"></span></button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= Translations ================= */
+const I18N = {
+en: {
+  app:'Rubber Estate', nav_home:'Home', nav_tap:'Tapping', nav_work:'Work', nav_sale:'Sales', nav_pay:'Wages', nav_set:'Settings',
+  date:'Date', estate:'Estate', tapper:'Tapper', trees:'Trees tapped', rate:'Rate / tree', sheets:'Sheets made', notes:'Notes',
+  wage:'Wage', save:'Save', recent:'Recent entries', none:'No entries yet', both:'Both', shared:'Shared (both estates)',
+  tap_title:'Daily tapping', work_title:'Estate work', type:'Work type', desc:'Description', workers:'Workers',
+  labour:'Labour cost', material:'Material cost', total:'Total',
+  desc_ph:'e.g. 2 bags, east side', workers_ph:'e.g. 3 hired + tapper',
+  sale_title:'Sheet sale', sold:'Sheets sold', kg:'Weight (kg)', price:'Price / kg', amount:'Amount', buyer:'Buyer',
+  pay_title:'Wage payment', paid_to:'Paid to', for:'For', for_ph:'e.g. 1–7 Oct',
+  month:'Month', year:'Year', profit:'Profit', loss:'Loss', income:'Income', costs:'Costs',
+  k_trees:'Trees tapped', k_sheets:'Sheets made', k_sold:'Sheets sold', k_stock:'Sheets in stock',
+  by_month:'By month', tap_wages:'Tapping wages', work_labour:'Work labour', materials:'Materials',
+  due:'Wages due', all_paid:'All wages paid', u_trees:'trees', u_sheets:'sheets', admin:'Admin',
+  saved:'Saved', deleted:'Deleted', confirm_del:'Delete this entry?', wage_saved:'Saved · wage {x}',
+  set_title:'Estates & wages', est_name:'Estate name', num_trees:'Number of trees', wage_tree:'Wage per tree',
+  add_est:'Add estate', remove:'Remove', new_est:'New estate', confirm_rm:'Remove {x}? Its past entries are kept.',
+  set_note:'A new rate applies to new entries only — past wages stay as they were. Renaming an estate also renames it on past entries.',
+  'c:Grass cutting':'Grass cutting', 'c:Fertiliser':'Fertiliser', 'c:Weeding':'Weeding', 'c:Spraying':'Spraying',
+  'c:Rain guarding':'Rain guarding', 'c:Other':'Other',
+  err_access:'No access for {x}. Ask the admin to add you.', err_no_trees:'Enter trees tapped',
+  err_dup_tap:'Tapping already saved for {x}', err_no_cost:'Enter labour or material cost', err_no_amount:'Enter sale amount',
+  err_no_pay:'Enter amount paid', err_admin_only:'Only admins can do this', err_not_found:'Entry not found',
+  err_bad_date:'Pick a valid date', err_unknown:'Estate not found', err_bad_lang:'Unknown language',
+  err_est_need:'Add at least one estate', err_est_name:'Every estate needs a name', err_est_both:'"Both" cannot be used as a name',
+  err_est_dup:'Estate names must be different', err_est_neg:'Values cannot be negative', err_est_swap:'Rename one estate at a time',
+  err_net:'No connection — please try again',
+  login_title:'Sign in', login_hint:'Ask the admin for your username and PIN.', username:'Username', pin:'PIN',
+  login:'Log in', logout:'Log out', account:'Account', estates_tab:'Estates', users_tab:'Users',
+  change_pin:'Change PIN', cur_pin:'Current PIN', new_pin:'New PIN', new_pin_opt:'New PIN (leave blank to keep)',
+  pin_changed:'PIN changed', role:'Role', member:'Member', name:'Name', add_user:'Add user', edit:'Edit',
+  cancel:'Cancel', new_user:'New user', remove_user:'Remove user', you:'you',
+  confirm_rm_user:'Remove {x}? They will be logged out.',
+  err_auth:'Please log in again', err_bad_login:'Wrong username or PIN', err_locked:'Too many tries. Wait 10 minutes.',
+  err_bad_pin:'Current PIN is wrong', err_pin_format:'PIN must be 4–8 digits',
+  err_bad_user:'Username: 3–20 letters or numbers, no spaces', err_no_name:'Enter a name',
+  err_user_taken:'That username is already used', err_self_admin:"You can't remove your own admin role",
+  err_self_remove:"You can't remove yourself",
+  reports:'PDF reports', rep_tap:'Tapper statement', rep_biz:'Business statement', rep_kind:'Report', kind_tap:'Tapper', kind_biz:'Business',
+  period:'Period', from:'From', to:'To', this_month:'This month', last_month:'Last month', this_year:'This year',
+  custom:'Custom', make_pdf:'Create PDF', making:'Creating PDF…', pdf_ready:'PDF ready', open_pdf:'Open PDF',
+  share_wa:'WhatsApp', stmt_for:'Statement for this tapper',
+  rep_lang_note:'The PDF is made in the language you are using now.',
+  wa_tap:'{x} – wage statement', wa_biz:'Rubber estate – business statement',
+  err_bad_range:'"From" date must be before "To" date', err_no_tapper:'Pick a tapper',
+  err_pdf_fail:'Could not create the PDF. Please try again.',
+  upd_title:'App updates', upd_check:'Check for updates', upd_checking:'Checking…', upd_now:'Update now',
+  upd_working:'Updating… (about 20 seconds)', upd_current:'Installed version: {x}', upd_latest:'You have the latest version.',
+  upd_avail:'New version {x} is ready.', upd_done:'Updated to {x}. Close the app fully and open it again.',
+  err_upd_fetch:'Could not reach GitHub. Try again in a minute.',
+  err_upd_bad:'The update files look incomplete, so nothing was changed.',
+  err_upd_api:'Turn on "Google Apps Script API" at script.google.com/home/usersettings, then try again.',
+  err_upd_scope:'The app needs permission to update itself. Run "setup" once in the Apps Script editor.',
+  err_upd_fail:'Update failed (error {x}). The app was not changed. Try again.'
+},
+ml: {
+  app:'റബ്ബർ എസ്റ്റേറ്റ്', nav_home:'ഹോം', nav_tap:'ടാപ്പിംഗ്', nav_work:'പണികൾ', nav_sale:'വിൽപ്പന', nav_pay:'കൂലി', nav_set:'സെറ്റിംഗ്',
+  date:'തീയതി', estate:'എസ്റ്റേറ്റ്', tapper:'ടാപ്പർ', trees:'ടാപ്പ് ചെയ്ത മരങ്ങൾ', rate:'ഒരു മരത്തിന്', sheets:'ഷീറ്റുകൾ', notes:'കുറിപ്പ്',
+  wage:'കൂലി', save:'സേവ് ചെയ്യുക', recent:'സമീപകാല എൻട്രികൾ', none:'എൻട്രികൾ ഇല്ല', both:'രണ്ടും', shared:'പൊതുവായത് (രണ്ട് എസ്റ്റേറ്റും)',
+  tap_title:'ദിവസേനയുള്ള ടാപ്പിംഗ്', work_title:'എസ്റ്റേറ്റ് പണികൾ', type:'പണിയുടെ തരം', desc:'വിവരണം', workers:'പണിക്കാർ',
+  labour:'കൂലിച്ചെലവ്', material:'സാധനച്ചെലവ്', total:'ആകെ',
+  desc_ph:'ഉദാ: 2 ചാക്ക്, കിഴക്ക് ഭാഗം', workers_ph:'ഉദാ: 3 പേർ + ടാപ്പർ',
+  sale_title:'ഷീറ്റ് വിൽപ്പന', sold:'വിറ്റ ഷീറ്റുകൾ', kg:'തൂക്കം (കി.ഗ്രാം)', price:'വില / കി.ഗ്രാം', amount:'തുക', buyer:'വാങ്ങിയയാൾ',
+  pay_title:'കൂലി നൽകൽ', paid_to:'ആർക്ക്', for:'കാലയളവ്', for_ph:'ഉദാ: ഒക്ടോ 1–7',
+  month:'മാസം', year:'വർഷം', profit:'ലാഭം', loss:'നഷ്ടം', income:'വരുമാനം', costs:'ചെലവ്',
+  k_trees:'ടാപ്പ് ചെയ്ത മരങ്ങൾ', k_sheets:'ഉണ്ടാക്കിയ ഷീറ്റ്', k_sold:'വിറ്റ ഷീറ്റ്', k_stock:'സ്റ്റോക്കിലുള്ള ഷീറ്റ്',
+  by_month:'മാസം തിരിച്ച്', tap_wages:'ടാപ്പിംഗ് കൂലി', work_labour:'പണിക്കൂലി', materials:'സാധനങ്ങൾ',
+  due:'കൊടുക്കാനുള്ള കൂലി', all_paid:'എല്ലാ കൂലിയും നൽകി', u_trees:'മരം', u_sheets:'ഷീറ്റ്', admin:'അഡ്മിൻ',
+  saved:'സേവ് ചെയ്തു', deleted:'ഡിലീറ്റ് ചെയ്തു', confirm_del:'ഈ എൻട്രി ഡിലീറ്റ് ചെയ്യണോ?', wage_saved:'സേവ് ചെയ്തു · കൂലി {x}',
+  set_title:'എസ്റ്റേറ്റുകളും കൂലിയും', est_name:'എസ്റ്റേറ്റിന്റെ പേര്', num_trees:'മരങ്ങളുടെ എണ്ണം', wage_tree:'ഒരു മരത്തിനുള്ള കൂലി',
+  add_est:'എസ്റ്റേറ്റ് ചേർക്കുക', remove:'നീക്കുക', new_est:'പുതിയ എസ്റ്റേറ്റ്', confirm_rm:'{x} നീക്കം ചെയ്യണോ? പഴയ എൻട്രികൾ നിലനിൽക്കും.',
+  set_note:'പുതിയ നിരക്ക് പുതിയ എൻട്രികൾക്ക് മാത്രം ബാധകം — പഴയ കൂലി മാറില്ല. എസ്റ്റേറ്റിന്റെ പേര് മാറ്റിയാൽ പഴയ എൻട്രികളിലും മാറും.',
+  'c:Grass cutting':'പുല്ലുവെട്ട്', 'c:Fertiliser':'വളമിടൽ', 'c:Weeding':'കളപറിക്കൽ', 'c:Spraying':'മരുന്നടി',
+  'c:Rain guarding':'റെയിൻ ഗാർഡ്', 'c:Other':'മറ്റുള്ളവ',
+  err_access:'{x} ന് ആക്സസ് ഇല്ല. അഡ്മിനോട് ചേർക്കാൻ പറയുക.', err_no_trees:'ടാപ്പ് ചെയ്ത മരങ്ങളുടെ എണ്ണം നൽകുക',
+  err_dup_tap:'{x} ന്റെ ടാപ്പിംഗ് ഇതിനകം സേവ് ചെയ്തിട്ടുണ്ട്', err_no_cost:'കൂലിച്ചെലവോ സാധനച്ചെലവോ നൽകുക', err_no_amount:'വിൽപ്പന തുക നൽകുക',
+  err_no_pay:'നൽകിയ തുക നൽകുക', err_admin_only:'അഡ്മിന് മാത്രമേ ഇത് ചെയ്യാൻ കഴിയൂ', err_not_found:'എൻട്രി കണ്ടെത്തിയില്ല',
+  err_bad_date:'ശരിയായ തീയതി തിരഞ്ഞെടുക്കുക', err_unknown:'എസ്റ്റേറ്റ് കണ്ടെത്തിയില്ല', err_bad_lang:'ഭാഷ തെറ്റാണ്',
+  err_est_need:'ഒരു എസ്റ്റേറ്റെങ്കിലും ചേർക്കുക', err_est_name:'എല്ലാ എസ്റ്റേറ്റിനും പേര് വേണം', err_est_both:'"Both" എന്ന പേര് ഉപയോഗിക്കാൻ പറ്റില്ല',
+  err_est_dup:'എസ്റ്റേറ്റ് പേരുകൾ വ്യത്യസ്തമായിരിക്കണം', err_est_neg:'നെഗറ്റീവ് സംഖ്യ പാടില്ല', err_est_swap:'ഒരു സമയം ഒരു എസ്റ്റേറ്റിന്റെ പേര് മാത്രം മാറ്റുക',
+  err_net:'കണക്ഷൻ ഇല്ല — വീണ്ടും ശ്രമിക്കുക',
+  login_title:'ലോഗിൻ ചെയ്യുക', login_hint:'യൂസർനെയിമും പിന്നും അഡ്മിനോട് ചോദിക്കുക.', username:'യൂസർനെയിം', pin:'പിൻ',
+  login:'ലോഗിൻ', logout:'ലോഗൗട്ട്', account:'അക്കൗണ്ട്', estates_tab:'എസ്റ്റേറ്റുകൾ', users_tab:'ഉപയോക്താക്കൾ',
+  change_pin:'പിൻ മാറ്റുക', cur_pin:'ഇപ്പോഴത്തെ പിൻ', new_pin:'പുതിയ പിൻ', new_pin_opt:'പുതിയ പിൻ (മാറ്റേണ്ടെങ്കിൽ ഒഴിവാക്കുക)',
+  pin_changed:'പിൻ മാറ്റി', role:'റോൾ', member:'അംഗം', name:'പേര്', add_user:'ഉപയോക്താവിനെ ചേർക്കുക', edit:'മാറ്റുക',
+  cancel:'റദ്ദാക്കുക', new_user:'പുതിയ ഉപയോക്താവ്', remove_user:'ഉപയോക്താവിനെ നീക്കുക', you:'നിങ്ങൾ',
+  confirm_rm_user:'{x} നെ നീക്കം ചെയ്യണോ? അവർ ലോഗൗട്ട് ആകും.',
+  err_auth:'വീണ്ടും ലോഗിൻ ചെയ്യുക', err_bad_login:'യൂസർനെയിം അല്ലെങ്കിൽ പിൻ തെറ്റാണ്', err_locked:'വളരെയധികം ശ്രമങ്ങൾ. 10 മിനിറ്റ് കാത്തിരിക്കുക.',
+  err_bad_pin:'ഇപ്പോഴത്തെ പിൻ തെറ്റാണ്', err_pin_format:'പിൻ 4–8 അക്കങ്ങൾ ആയിരിക്കണം',
+  err_bad_user:'യൂസർനെയിം: 3–20 അക്ഷരങ്ങൾ/അക്കങ്ങൾ, സ്പേസ് പാടില്ല', err_no_name:'പേര് നൽകുക',
+  err_user_taken:'ഈ യൂസർനെയിം ഇതിനകം ഉപയോഗത്തിലുണ്ട്', err_self_admin:'സ്വന്തം അഡ്മിൻ റോൾ മാറ്റാൻ പറ്റില്ല',
+  err_self_remove:'സ്വയം നീക്കം ചെയ്യാൻ പറ്റില്ല',
+  reports:'PDF റിപ്പോർട്ടുകൾ', rep_tap:'ടാപ്പർ സ്റ്റേറ്റ്മെന്റ്', rep_biz:'ബിസിനസ് സ്റ്റേറ്റ്മെന്റ്', rep_kind:'റിപ്പോർട്ട്', kind_tap:'ടാപ്പർ', kind_biz:'ബിസിനസ്',
+  period:'കാലയളവ്', from:'മുതൽ', to:'വരെ', this_month:'ഈ മാസം', last_month:'കഴിഞ്ഞ മാസം', this_year:'ഈ വർഷം',
+  custom:'മറ്റുള്ളവ', make_pdf:'PDF ഉണ്ടാക്കുക', making:'PDF തയ്യാറാക്കുന്നു…', pdf_ready:'PDF തയ്യാർ', open_pdf:'PDF തുറക്കുക',
+  share_wa:'വാട്സ്ആപ്പ്', stmt_for:'ഈ ടാപ്പറുടെ സ്റ്റേറ്റ്മെന്റ്',
+  rep_lang_note:'ഇപ്പോൾ ഉപയോഗിക്കുന്ന ഭാഷയിൽ PDF തയ്യാറാകും.',
+  wa_tap:'{x} – കൂലി സ്റ്റേറ്റ്മെന്റ്', wa_biz:'റബ്ബർ എസ്റ്റേറ്റ് – ബിസിനസ് സ്റ്റേറ്റ്മെന്റ്',
+  err_bad_range:'"മുതൽ" തീയതി "വരെ" തീയതിക്ക് മുമ്പായിരിക്കണം', err_no_tapper:'ടാപ്പറെ തിരഞ്ഞെടുക്കുക',
+  err_pdf_fail:'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.',
+  upd_title:'ആപ്പ് അപ്ഡേറ്റ്', upd_check:'അപ്ഡേറ്റ് ഉണ്ടോ എന്ന് നോക്കുക', upd_checking:'നോക്കുന്നു…', upd_now:'ഇപ്പോൾ അപ്ഡേറ്റ് ചെയ്യുക',
+  upd_working:'അപ്ഡേറ്റ് ചെയ്യുന്നു… (ഏകദേശം 20 സെക്കൻഡ്)', upd_current:'ഇപ്പോഴത്തെ പതിപ്പ്: {x}', upd_latest:'ഏറ്റവും പുതിയ പതിപ്പാണ്.',
+  upd_avail:'പുതിയ പതിപ്പ് {x} തയ്യാർ.', upd_done:'{x} ലേക്ക് അപ്ഡേറ്റ് ചെയ്തു. ആപ്പ് പൂർണ്ണമായി അടച്ച് വീണ്ടും തുറക്കുക.',
+  err_upd_fetch:'GitHub ലഭ്യമല്ല. ഒരു മിനിറ്റ് കഴിഞ്ഞ് ശ്രമിക്കുക.',
+  err_upd_bad:'അപ്ഡേറ്റ് ഫയലുകൾ പൂർണ്ണമല്ല, ഒന്നും മാറ്റിയിട്ടില്ല.',
+  err_upd_api:'script.google.com/home/usersettings ൽ "Google Apps Script API" ഓൺ ചെയ്ത് വീണ്ടും ശ്രമിക്കുക.',
+  err_upd_scope:'അപ്ഡേറ്റിന് അനുമതി വേണം. Apps Script എഡിറ്ററിൽ "setup" ഒരിക്കൽ റൺ ചെയ്യുക.',
+  err_upd_fail:'അപ്ഡേറ്റ് പരാജയപ്പെട്ടു (പിശക് {x}). വീണ്ടും ശ്രമിക്കുക.'
+}};
+const CATS = ['Grass cutting', 'Fertiliser', 'Weeding', 'Spraying', 'Rain guarding', 'Other'];
+const SHEET_OF = { tap: 'Tapping', work: 'Work', sale: 'Sales', pay: 'Payments' };
+
+/* ================= Helpers ================= */
+let L = 'en', APP = null, CUR = '₹', view = 'home', mode = 'm', lastDash = null, draft = [];
+const lists = {};
+const $ = id => document.getElementById(id);
+const t = (k, x) => String(I18N[L][k] ?? I18N.en[k] ?? k).replace('{x}', x ?? '');
+const n = id => Number($(id).value) || 0;
+const loc = () => L === 'ml' ? 'ml-IN' : 'en-IN';
+const fmtN = v => Number(v || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const money = v => (v < 0 ? '−' : '') + CUR + Math.abs(Number(v || 0)).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const estName = v => v === 'Both' ? t('both') : v;
+const isAdmin = () => APP && APP.user.role === 'Admin';
+const initials = s => String(s || '?').split(/\s+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+};
+let TOKEN = store.get('re_token');
+L = store.get('re_lang') || 'en';
+// raw: no login needed (login itself) · call: sends the login token with every request
+const raw = (fn, ...a) => new Promise((ok, no) => google.script.run.withSuccessHandler(ok).withFailureHandler(no)[fn](...a));
+const call = (fn, ...a) => raw(fn, TOKEN, ...a).catch(e => {
+  if (/ERR:auth/.test(String((e && e.message) || e))) signedOut();
+  throw e;
+});
+function errMsg(e) {
+  const s = String((e && e.message) || e || '');
+  const m = s.match(/ERR:(\w+)(?:\|(.*))?/);
+  if (m) return t('err_' + m[1], m[2]);
+  return /network|NetworkError|failed to fetch/i.test(s) ? t('err_net') : s;
+}
+function toast(msg, bad) {
+  const el = $('toast'); el.textContent = msg; el.className = 'toast show' + (bad ? ' bad' : '');
+  clearTimeout(el._h); el._h = setTimeout(() => el.className = 'toast', 2600);
+}
+function dchip(s) {
+  const d = new Date(s + 'T00:00:00');
+  if (isNaN(d)) return '<div class="dt"><b>–</b></div>';
+  return `<div class="dt"><b>${d.getDate()}</b><small>${esc(d.toLocaleDateString(loc(), { month: 'short' }))}</small></div>`;
+}
+
+/* segmented picker: stores its value in data-v */
+function seg(id, items, onChange) {
+  const el = $(id), prev = el.dataset.v;
+  el.innerHTML = items.map(it => `<button type="button" data-v="${esc(it.v)}">${esc(it.l)}</button>`).join('');
+  const pick = (v, fire) => {
+    el.dataset.v = v ?? '';
+    [...el.children].forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    if (fire && onChange) onChange(v);
+  };
+  [...el.children].forEach(b => b.onclick = () => pick(b.dataset.v, true));
+  const start = items.some(i => i.v === prev) ? prev : (items[0] || {}).v;
+  pick(start, start !== prev);
+}
+const sv = id => $(id).dataset.v || '';
+
+/* ================= Startup ================= */
+function applyInit(d) {
+  APP = d; CUR = d.currency;
+  $('av').textContent = initials(d.user.name);
+  $('av').title = d.user.name;
+  $('tTapper').readOnly = !isAdmin(); $('tRate').readOnly = !isAdmin();
+  renderText();
+}
+
+// after a successful init: show the app
+function boot(d, justLoggedIn) {
+  if (justLoggedIn && d.user.lang !== L) call('setLanguage', L).catch(() => {});  // keep the language picked on the login screen
+  else { L = d.user.lang || L; store.set('re_lang', L); }
+  applyInit(d);
+  document.querySelectorAll('input[type=date]').forEach(i => i.value = d.today);
+  $('period').value = d.today.slice(0, 7);
+  if ($('splash')) $('splash').remove();
+  document.querySelector('nav').hidden = false;
+  $('av').hidden = false;
+  show('home');
+}
+
+function showLogin() {
+  if ($('splash')) $('splash').remove();
+  view = 'login';
+  document.querySelector('nav').hidden = true;
+  $('av').hidden = true;
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === 'login'));
+  renderText();
+  window.scrollTo(0, 0);
+}
+
+function signedOut() {
+  TOKEN = null; store.set('re_token', null);
+  APP = null; lastDash = null; users = null; editing = null; setTab = 'account';
+  Object.keys(lists).forEach(k => delete lists[k]);
+  $('dash').innerHTML = '';
+  showLogin();
+}
+
+function buildPickers() {
+  const est = APP.estates.map(e => ({ v: e.name, l: e.name }));
+  const estB = est.concat([{ v: 'Both', l: t('both') }]);
+  seg('tEstate', est, fillTapper);
+  seg('wEstate', estB);
+  seg('sEstate', estB);
+  seg('wCat', CATS.map(c => ({ v: c, l: t('c:' + c) })));
+  seg('pMode', [{ v: 'm', l: t('month') }, { v: 'y', l: t('year') }], v => { mode = v; loadDash(); });
+  const keep = $('pTo').value;
+  $('pTo').innerHTML = APP.people.map(p => `<option>${esc(p)}</option>`).join('');
+  if (APP.people.includes(keep)) $('pTo').value = keep;
+}
+
+function renderText() {
+  document.documentElement.lang = L;
+  document.title = t('app');
+  document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll('[data-ph]').forEach(el => el.placeholder = t(el.dataset.ph));
+  document.querySelectorAll('.cur').forEach(el => el.textContent = CUR);
+  document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('on', b.dataset.l === L));
+  if (!APP) return;
+  buildPickers();
+  calcTap(); calcWork();
+  if (view === 'home' && lastDash) renderDash(lastDash);
+  if (SHEET_OF[view] && lists[SHEET_OF[view]]) drawList(SHEET_OF[view]);
+  if (view === 'set') renderSettings(false);
+  if (view === 'rep') drawReports();
+}
+
+function show(v) {
+  view = v;
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === v));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  window.scrollTo(0, 0);
+  if (v === 'home') loadDash();
+  else if (v === 'set') renderSettings(true);
+  else if (v === 'rep') drawReports();
+  else loadList(SHEET_OF[v]);
+}
+
+document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
+  if (b.dataset.l === L) return;
+  L = b.dataset.l; store.set('re_lang', L); renderText();
+  if (TOKEN && APP) call('setLanguage', L).catch(() => {});
+});
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.v));
+$('av').onclick = () => { setTab = 'account'; show('set'); };
+$('period').onchange = loadDash;
+
+/* ---- login ---- */
+$('lBtn').onclick = async function () {
+  this.disabled = true;
+  try {
+    TOKEN = await raw('login', $('lUser').value, $('lPin').value);
+    store.set('re_token', TOKEN);
+    $('lPin').value = '';
+    boot(await call('init'), true);
+  } catch (e) { toast(errMsg(e), true); }
+  this.disabled = false;
+};
+$('lPin').onkeydown = e => { if (e.key === 'Enter') $('lBtn').click(); };
+
+// start: reuse the saved login if there is one
+renderText();
+if (!TOKEN) showLogin();
+else call('init').then(d => boot(d)).catch(e => {
+  if (TOKEN && $('splash')) $('splash').innerHTML = `<div>${esc(errMsg(e))}</div>`;
+});
+
+/* ================= Forms ================= */
+function fillTapper(v) {
+  const e = APP.estates.find(x => x.name === (v || sv('tEstate'))) || {};
+  $('tTapper').value = e.tapper || ''; $('tRate').value = e.rate || ''; calcTap();
+}
+function calcTap() { $('tWage').textContent = money(n('tTrees') * n('tRate')); }
+function calcWork() { $('wTot').textContent = money(n('wLab') + n('wMat')); }
+$('tTrees').oninput = $('tRate').oninput = calcTap;
+$('wLab').oninput = $('wMat').oninput = calcWork;
+$('sKg').oninput = $('sPrice').oninput = () => {
+  if (n('sKg') && n('sPrice')) $('sAmt').value = Math.round(n('sKg') * n('sPrice') * 100) / 100;
+};
+const clear = ids => ids.forEach(i => $(i).value = '');
+
+async function save(btn, fn, data, sheet, okMsg, after) {
+  btn.disabled = true;
+  try {
+    const r = await call(fn, data);
+    toast(okMsg ? okMsg(r) : t('saved'));
+    if (after) after();
+    loadList(sheet);
+  } catch (e) { toast(errMsg(e), true); }
+  btn.disabled = false;
+}
+$('tSave').onclick = function () {
+  save(this, 'addTapping', { date: $('tDate').value, estate: sv('tEstate'), tapper: $('tTapper').value,
+    trees: n('tTrees'), rate: n('tRate'), sheets: n('tSheets'), notes: $('tNotes').value },
+    'Tapping', r => t('wage_saved', money(r)), () => { clear(['tTrees', 'tSheets', 'tNotes']); calcTap(); });
+};
+$('wSave').onclick = function () {
+  save(this, 'addWork', { date: $('wDate').value, estate: sv('wEstate'), category: sv('wCat'),
+    description: $('wDesc').value, workers: $('wWorkers').value, labour: n('wLab'), material: n('wMat') },
+    'Work', null, () => { clear(['wDesc', 'wWorkers', 'wLab', 'wMat']); calcWork(); });
+};
+$('sSave').onclick = function () {
+  save(this, 'addSale', { date: $('sDate').value, estate: sv('sEstate'), sheets: n('sSheets'),
+    kg: n('sKg'), price: n('sPrice'), amount: n('sAmt'), buyer: $('sBuyer').value },
+    'Sales', null, () => clear(['sSheets', 'sKg', 'sPrice', 'sAmt', 'sBuyer']));
+};
+$('pSave').onclick = function () {
+  save(this, 'addPayment', { date: $('pDate').value, to: $('pTo').value, amount: n('pAmt'), note: $('pNote').value },
+    'Payments', null, () => clear(['pAmt', 'pNote']));
+};
+
+/* ================= Recent lists ================= */
+const VIEW = {
+  Tapping:  r => [estName(r[2]), `${fmtN(r[4])} ${t('u_trees')} · ${fmtN(r[7])} ${t('u_sheets')} · ${r[9] || ''}`, r[6]],
+  Work:     r => [t('c:' + r[3]), [estName(r[2]), r[4] || r[5]].filter(Boolean).join(' · '), r[8]],
+  Sales:    r => [`${fmtN(r[3])} ${t('u_sheets')} · ${fmtN(r[4])} kg`, [estName(r[2]), r[7]].filter(Boolean).join(' · '), r[6]],
+  Payments: r => [r[2], r[4] || '', r[3]]
+};
+async function loadList(sheet) {
+  if (!lists[sheet]) $('list-' + sheet).innerHTML = '<div class="empty"><div class="spin"></div></div>';
+  try { lists[sheet] = await call('getRecent', sheet); drawList(sheet); }
+  catch (e) { $('list-' + sheet).innerHTML = `<div class="empty">${esc(errMsg(e))}</div>`; }
+}
+function drawList(sheet) {
+  const rows = lists[sheet] || [];
+  $('list-' + sheet).innerHTML = rows.length ? rows.map(r => {
+    const [a, b, amt] = VIEW[sheet](r);
+    return `<div class="li">${dchip(r[1])}
+      <div class="t"><b>${esc(a)}</b><small>${esc(b)}</small></div>
+      <div class="amt">${money(amt)}</div>
+      ${isAdmin() ? `<button class="ic" data-del="${esc(r[0])}" aria-label="Delete"><svg class="i"><use href="#i-trash"/></svg></button>` : ''}
+    </div>`;
+  }).join('') : `<div class="empty">${t('none')}</div>`;
+  $('list-' + sheet).querySelectorAll('[data-del]').forEach(b => b.onclick = () => del(sheet, b.dataset.del));
+}
+async function del(sheet, id) {
+  if (!confirm(t('confirm_del'))) return;
+  try { await call('deleteEntry', sheet, id); toast(t('deleted')); loadList(sheet); }
+  catch (e) { toast(errMsg(e), true); }
+}
+
+/* ================= Dashboard ================= */
+function periodLabel() {
+  const p = $('period').value;
+  if (mode === 'y') return p.slice(0, 4);
+  const d = new Date(p + '-01T00:00:00');
+  return isNaN(d) ? p : d.toLocaleDateString(loc(), { month: 'long', year: 'numeric' });
+}
+async function loadDash() {
+  if (!$('period').value) return;
+  const p = mode === 'y' ? $('period').value.slice(0, 4) : $('period').value;
+  if (!lastDash) $('dash').innerHTML = '<div class="empty"><div class="spin"></div></div>';
+  try { lastDash = await call('getDashboard', p); renderDash(lastDash); }
+  catch (e) { $('dash').innerHTML = `<div class="empty">${esc(errMsg(e))}</div>`; }
+}
+const tr = (l, v, cls) => `<tr class="${cls || ''}"><td>${l}</td><td>${v}</td></tr>`;
+const tile = (k, v) => `<div class="tile"><small>${t(k)}</small><b>${fmtN(v)}</b></div>`;
+function renderDash(d) {
+  const T = d.total, curM = $('period').value;
+  const max = Math.max(1, ...d.trend.map(m => Math.max(m.income, m.cost)));
+  const table = e => `<table class="tbl">
+    ${e.trees ? tr(t('k_trees'), fmtN(e.trees)) + tr(t('k_sheets'), fmtN(e.sheets)) : ''}
+    ${tr(t('income'), money(e.income))}
+    ${tr(t('tap_wages'), money(-e.wages))}
+    ${tr(t('work_labour'), money(-e.labour))}
+    ${tr(t('materials'), money(-e.material))}
+    ${tr(t(e.profit < 0 ? 'loss' : 'profit'), money(e.profit), 'tot' + (e.profit < 0 ? ' neg' : ''))}
+  </table>`;
+  $('dash').innerHTML = `
+  <div class="card hero">
+    <small>${t(T.profit < 0 ? 'loss' : 'profit')} · ${esc(periodLabel())}</small>
+    <div class="big">${money(T.profit)}</div>
+    <div class="two">
+      <div><small>${t('income')}</small><b>${money(T.income)}</b></div>
+      <div><small>${t('costs')}</small><b>${money(T.cost)}</b></div>
+    </div>
+  </div>
+  <div class="tiles">${tile('k_trees', T.trees)}${tile('k_sheets', T.sheets)}${tile('k_sold', T.sold)}${tile('k_stock', d.stock)}</div>
+  <div class="card"><h3>${t('by_month')} · ${esc(curM.slice(0, 4))}</h3>
+    <div class="bars">${d.trend.map(m => `<div class="m ${mode === 'm' && m.month === curM ? 'cur' : ''}">
+      <div class="p"><i class="a" style="height:${m.income / max * 100}%"></i><i class="c" style="height:${m.cost / max * 100}%"></i></div>
+      <span>${esc(new Date(m.month + '-01T00:00:00').toLocaleDateString(loc(), { month: 'narrow' }))}</span></div>`).join('')}</div>
+    <div class="lg"><span><i style="background:var(--pri2)"></i>${t('income')}</span><span><i style="background:var(--amber)"></i>${t('costs')}</span></div>
+  </div>
+  ${d.estates.map(e => `<div class="card"><h3>${esc(e.name === 'Both' ? t('shared') : e.name)}</h3>${table(e)}</div>`).join('')}
+  <div class="card"><h3>${t('due')}</h3>
+    ${d.due.length ? `<table class="tbl">${d.due.map(x => tr(esc(x.name), money(x.due), x.due < 0 ? 'neg' : '')).join('')}</table>`
+                   : `<div class="empty">${t('all_paid')}</div>`}
+  </div>`;
+}
+
+/* ================= PDF reports ================= */
+let rep = { kind: 'tapper', tapper: '', quick: 'this_month' };
+const ymdL = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function quickRange(q) {
+  const today = new Date(APP.today + 'T00:00:00'), y = today.getFullYear(), m = today.getMonth();
+  if (q === 'last_month') return [ymdL(new Date(y, m - 1, 1)), ymdL(new Date(y, m, 0))];
+  if (q === 'this_year') return [y + '-01-01', APP.today];
+  return [ymdL(new Date(y, m, 1)), APP.today];
+}
+function openReports(kind, tapper) {
+  rep.kind = kind;
+  if (tapper) rep.tapper = tapper;
+  rep.quick = 'this_month';
+  [$('rFrom').value, $('rTo').value] = quickRange('this_month');
+  $('rOut').hidden = true;
+  show('rep');
+}
+function drawReports() {
+  $('rKind').dataset.v = rep.kind;
+  seg('rKind', [{ v: 'tapper', l: t('kind_tap') }, { v: 'business', l: t('kind_biz') }],
+    v => { rep.kind = v; $('rOut').hidden = true; drawReports(); });
+  $('rTapWrap').hidden = rep.kind !== 'tapper';
+  $('rTapper').innerHTML = APP.people.map(p => `<option>${esc(p)}</option>`).join('');
+  if (APP.people.includes(rep.tapper)) $('rTapper').value = rep.tapper;
+  $('rQuick').dataset.v = rep.quick;
+  seg('rQuick', ['this_month', 'last_month', 'this_year', 'custom'].map(q => ({ v: q, l: t(q) })), v => {
+    rep.quick = v;
+    if (v !== 'custom') [$('rFrom').value, $('rTo').value] = quickRange(v);
+  });
+  if (!$('rFrom').value) [$('rFrom').value, $('rTo').value] = quickRange(rep.quick);
+}
+$('rTapper').onchange = () => rep.tapper = $('rTapper').value;
+$('rFrom').onchange = $('rTo').onchange = () => { rep.quick = 'custom'; $('rQuick').dataset.v = 'custom'; drawReports(); };
+$('goRepTap').onclick = () => openReports('tapper');
+$('goRepBiz').onclick = () => openReports('business');
+$('pStmt').onclick = () => openReports('tapper', $('pTo').value);
+$('rMake').onclick = async function () {
+  const btn = this, label = btn.querySelector('span');
+  btn.disabled = true; label.textContent = t('making'); $('rOut').hidden = true;
+  try {
+    const tapper = $('rTapper').value;
+    const r = await call('makeReport', { kind: rep.kind, tapper, from: $('rFrom').value, to: $('rTo').value, lang: L });
+    $('rName').textContent = r.name;
+    $('rOpen').href = r.url;
+    const msg = (rep.kind === 'tapper' ? t('wa_tap', tapper) : t('wa_biz')) + '\n' + r.url;
+    $('rWa').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+    $('rOut').hidden = false;
+    $('rOut').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) { toast(errMsg(e), true); }
+  btn.disabled = false; label.textContent = t('make_pdf');
+};
+
+/* ================= Settings ================= */
+let setTab = 'account', users = null, editing = null;
+function renderSettings(reset) {
+  const admin = isAdmin();
+  if (!admin) setTab = 'account';
+  $('setTabs').dataset.v = setTab;
+  seg('setTabs', [{ v: 'account', l: t('account') }].concat(admin
+    ? [{ v: 'estates', l: t('estates_tab') }, { v: 'users', l: t('users_tab') }] : []),
+    v => { setTab = v; renderSettings(true); });
+  $('setTabs').hidden = !admin;
+  $('setAccount').hidden = setTab !== 'account';
+  $('setEstates').hidden = setTab !== 'estates';
+  $('setUsers').hidden = setTab !== 'users';
+  if (setTab === 'account') drawAccount();
+  if (setTab === 'estates') { if (reset) draft = APP.estates.map(e => ({ ...e, old: e.name })); drawSettings(); }
+  if (setTab === 'users') { if (reset || !users) loadUsers(); else drawUsers(); }
+}
+
+/* ---- account (everyone) ---- */
+function drawAccount() {
+  $('av2').textContent = initials(APP.user.name);
+  $('meName').textContent = APP.user.name;
+  $('meSub').textContent = '@' + APP.user.username + ' · ' + t(isAdmin() ? 'admin' : 'member');
+  $('updCard').hidden = !isAdmin();
+  drawUpdate();
+}
+
+/* ---- app updates (admin) ---- */
+let upd = null;   // result of the last check
+function drawUpdate() {
+  const lines = [];
+  if (upd) lines.push(t('upd_current', upd.current));
+  if (upd && upd.done) lines.push(t('upd_done', upd.done));
+  else if (upd) lines.push(upd.newer ? t('upd_avail', upd.latest) + (upd.notes ? ' ' + upd.notes : '') : t('upd_latest'));
+  $('updInfo').textContent = lines.join(' ');
+  $('updInfo').hidden = !lines.length;
+  $('updConfirm').hidden = !(upd && upd.newer && !upd.done);
+  $('updCheck').hidden = !!(upd && upd.newer && !upd.done);
+}
+$('updCheck').onclick = async function () {
+  const s = this.querySelector('span'); this.disabled = true; s.textContent = t('upd_checking');
+  try { upd = await call('checkUpdate'); drawUpdate(); } catch (e) { toast(errMsg(e), true); }
+  this.disabled = false; s.textContent = t('upd_check');
+};
+$('updNo').onclick = () => { upd = null; drawUpdate(); };
+$('updYes').onclick = async function () {
+  const s = this.querySelector('span'); this.disabled = true; $('updNo').disabled = true; s.textContent = t('upd_working');
+  try { upd.done = await call('applyUpdate'); drawUpdate(); } catch (e) { toast(errMsg(e), true); }
+  this.disabled = false; $('updNo').disabled = false; s.textContent = t('upd_now');
+};
+$('cpSave').onclick = async function () {
+  this.disabled = true;
+  try {
+    await call('changePin', $('cpOld').value, $('cpNew').value);
+    clear(['cpOld', 'cpNew']); toast(t('pin_changed'));
+  } catch (e) { toast(errMsg(e), true); }
+  this.disabled = false;
+};
+$('logoutBtn').onclick = () => { call('logout').catch(() => {}); signedOut(); };
+
+/* ---- users (admin) ---- */
+async function loadUsers() {
+  if (!users) $('userList').innerHTML = '<div class="empty"><div class="spin"></div></div>';
+  try { users = await call('getUsers'); drawUsers(); }
+  catch (e) { $('userList').innerHTML = `<div class="empty">${esc(errMsg(e))}</div>`; }
+}
+function drawUsers() {
+  $('userList').innerHTML = (users || []).map((u, i) => `<div class="urow">
+    <div class="av">${esc(initials(u.name))}</div>
+    <div class="t"><b>${esc(u.name)}${u.username === APP.user.username ? ' (' + t('you') + ')' : ''}</b><small>@${esc(u.username)}</small></div>
+    <span class="pill ${u.role === 'Admin' ? '' : 'm'}">${t(u.role === 'Admin' ? 'admin' : 'member')}</span>
+    <button class="mini" data-ed="${i}">${t('edit')}</button>
+  </div>`).join('') || `<div class="empty">${t('none')}</div>`;
+  $('userList').querySelectorAll('[data-ed]').forEach(b => b.onclick = () => openUser(users[b.dataset.ed]));
+  drawUserForm();
+}
+function openUser(u) {
+  editing = u ? { ...u, isNew: false, pin: '' } : { isNew: true, username: '', name: '', role: 'Member', pin: '' };
+  drawUserForm();
+  $('userForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function drawUserForm() {
+  $('userForm').hidden = !editing;
+  $('addUser').hidden = !!editing;
+  if (!editing) return;
+  $('ufTitle').textContent = editing.isNew ? t('new_user') : editing.name;
+  $('ufName').value = editing.name;
+  $('ufUser').value = editing.username;
+  $('ufUser').readOnly = !editing.isNew;          // username is the login key; it can't be changed later
+  $('ufPinLbl').textContent = editing.isNew ? t('pin') : t('new_pin_opt');
+  $('ufPin').value = editing.pin || '';
+  $('ufRole').dataset.v = editing.role;
+  seg('ufRole', [{ v: 'Member', l: t('member') }, { v: 'Admin', l: t('admin') }], v => editing.role = v);
+  $('ufRemove').hidden = editing.isNew || editing.username === APP.user.username;
+}
+$('ufName').oninput = () => editing && (editing.name = $('ufName').value);
+$('ufUser').oninput = () => editing && (editing.username = $('ufUser').value);
+$('ufPin').oninput = () => editing && (editing.pin = $('ufPin').value);
+$('addUser').onclick = () => openUser(null);
+$('ufCancel').onclick = () => { editing = null; drawUserForm(); };
+$('ufSave').onclick = async function () {
+  this.disabled = true;
+  try {
+    await call('saveUser', { isNew: editing.isNew, username: editing.username, name: editing.name,
+      role: sv('ufRole'), pin: editing.pin });
+    toast(t('saved'));
+    editing = null;
+    applyInit(await call('init'));      // refresh own name/role if it changed
+    await loadUsers();
+  } catch (e) { toast(errMsg(e), true); }
+  this.disabled = false;
+};
+$('ufRemove').onclick = async function () {
+  if (!editing || !confirm(t('confirm_rm_user', editing.name))) return;
+  try { await call('removeUser', editing.username); toast(t('deleted')); editing = null; await loadUsers(); }
+  catch (e) { toast(errMsg(e), true); }
+};
+
+/* ---- estates (admin) ---- */
+function drawSettings() {
+  $('estList').innerHTML = draft.map((e, i) => `<div class="card">
+    <div class="hd"><h3>${esc(e.old || t('new_est'))}</h3><button class="link" data-rm="${i}">${t('remove')}</button></div>
+    <div class="f"><label>${t('est_name')}</label><input data-i="${i}" data-k="name" value="${esc(e.name)}"></div>
+    <div class="g2">
+      <div class="f"><label>${t('num_trees')}</label><input class="num" type="number" inputmode="numeric" data-i="${i}" data-k="trees" value="${e.trees || ''}"></div>
+      <div class="f"><label>${t('wage_tree')}</label><div class="affix"><span>${esc(CUR)}</span><input class="num" type="number" step="0.01" inputmode="decimal" data-i="${i}" data-k="rate" value="${e.rate || ''}"></div></div>
+    </div>
+    <div class="f" style="margin-bottom:0"><label>${t('tapper')}</label><input data-i="${i}" data-k="tapper" value="${esc(e.tapper)}"></div>
+  </div>`).join('');
+  $('estList').querySelectorAll('[data-k]').forEach(inp => inp.oninput = () => draft[inp.dataset.i][inp.dataset.k] = inp.value);
+  $('estList').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => {
+    const e = draft[b.dataset.rm];
+    if (e.old && !confirm(t('confirm_rm', e.old))) return;
+    draft.splice(b.dataset.rm, 1); drawSettings();
+  });
+}
+$('addEst').onclick = () => { draft.push({ name: '', trees: '', tapper: '', rate: '', old: '' }); drawSettings(); };
+$('saveEst').onclick = async function () {
+  this.disabled = true;
+  try {
+    await call('saveEstates', draft);
+    toast(t('saved'));
+    applyInit(await call('init'));
+    renderSettings(true);
+  } catch (e) { toast(errMsg(e), true); }
+  this.disabled = false;
+};
+</script>
+</body>
+</html>
