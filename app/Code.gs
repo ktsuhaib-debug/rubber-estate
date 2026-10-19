@@ -10,7 +10,7 @@ const DEFAULT_LANG = 'en';     // 'en' or 'ml' for new users
 const SESSION_DAYS = 60;       // how long a phone stays logged in
 
 // One-tap updates: the app pulls new code from GitHub and redeploys itself
-const APP_VERSION = '2026-10-19.1';
+const APP_VERSION = '2026-10-19.2';
 const UPDATE_SOURCE = 'https://raw.githubusercontent.com/ktsuhaib-debug/rubber-estate/main/app/';
 const DEPLOYMENT_ID = 'AKfycbxEcVDSsLdNojQPJS0uEarz-izEYhv5u4bvGQswwKImisyLLRm7_nJ9EiL_BhGW3-gh';
 
