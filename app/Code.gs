@@ -9,10 +9,6 @@ const APP_NAME = 'Rubber Estate';
 const DEFAULT_LANG = 'en';     // 'en' or 'ml' for new users
 const SESSION_DAYS = 60;       // how long a phone stays logged in
 
-// One-tap updates: the app pulls new code from GitHub and redeploys itself
-const APP_VERSION = '2026-10-19.2';
-const UPDATE_SOURCE = 'https://raw.githubusercontent.com/ktsuhaib-debug/rubber-estate/main/app/';
-const DEPLOYMENT_ID = 'AKfycbxEcVDSsLdNojQPJS0uEarz-izEYhv5u4bvGQswwKImisyLLRm7_nJ9EiL_BhGW3-gh';
 
 const SCHEMA = {
   Users:    ['Username', 'Name', 'Role', 'PIN (hashed)', 'Language', 'Active'],
@@ -279,68 +275,6 @@ function removeUser(token, username) {
     sh_('Users').deleteRow(i + 2);      // their sessions stop working on the next request
   } finally { lock.releaseLock(); }
   return true;
-}
-
-/* ---------- Admin: app updates ---------- */
-function checkUpdate(token) {
-  admin_(token);
-  const v = JSON.parse(fetchUpdate_('version.json'));
-  return { current: APP_VERSION, latest: String(v.version), notes: String(v.notes || ''), newer: cmpVer_(v.version, APP_VERSION) > 0 };
-}
-function cmpVer_(a, b) {          // '2026-10-19.2' style versions, compared part by part
-  const x = String(a).split(/[-.]/).map(Number), y = String(b).split(/[-.]/).map(Number);
-  for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; }
-  return 0;
-}
-
-function applyUpdate(token) {
-  admin_(token);
-  const lock = LockService.getScriptLock();
-  lock.waitLock(30000);
-  try {
-    const v = JSON.parse(fetchUpdate_('version.json'));
-    const code = fetchUpdate_('Code.gs'), index = fetchUpdate_('Index.html');
-    // refuse anything that doesn't look like a complete copy of this app
-    if (code.indexOf('function doGet') < 0 || code.indexOf("APP_VERSION = '" + v.version + "'") < 0 ||
-        index.indexOf('</html>') < 0) err_('upd_bad');
-
-    const id = ScriptApp.getScriptId();
-    const base = 'https://script.googleapis.com/v1/projects/' + id;
-    const files = gapi_('get', base + '/content').files.map(f => ({ name: f.name, type: f.type, source: f.source }));
-    putFile_(files, 'Code', 'SERVER_JS', code, f => f.source.indexOf('const APP_NAME') >= 0);
-    putFile_(files, 'Index', 'HTML', index, f => f.source.indexOf('I18N') >= 0);
-    gapi_('put', base + '/content', { files: files });
-    const ver = gapi_('post', base + '/versions', { description: 'v' + v.version });
-    gapi_('put', base + '/deployments/' + DEPLOYMENT_ID, {
-      deploymentConfig: { scriptId: id, versionNumber: ver.versionNumber, manifestFileName: 'appsscript', description: 'v' + v.version }
-    });
-    return String(v.version);
-  } finally { lock.releaseLock(); }
-}
-
-function fetchUpdate_(file) {
-  const r = UrlFetchApp.fetch(UPDATE_SOURCE + file + '?t=' + Date.now(), { muteHttpExceptions: true });
-  if (r.getResponseCode() !== 200) err_('upd_fetch');
-  return r.getContentText();
-}
-
-function putFile_(files, name, type, source, looksLike) {
-  const f = files.find(x => x.name === name && x.type === type) ||
-            files.find(x => x.type === type && looksLike(x));
-  if (f) f.source = source; else files.push({ name: name, type: type, source: source });
-}
-
-function gapi_(method, url, body) {
-  const opt = { method: method, headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true };
-  if (body) { opt.contentType = 'application/json'; opt.payload = JSON.stringify(body); }
-  const r = UrlFetchApp.fetch(url, opt), c = r.getResponseCode(), t = r.getContentText();
-  if (c >= 300) {
-    console.error(method, url, c, t);
-    if (/SERVICE_DISABLED|has not been used|not enabled|is disabled/i.test(t)) err_('upd_api');
-    if (c === 401 || c === 403) err_('upd_scope');
-    err_('upd_fail', String(c));
-  }
-  return t ? JSON.parse(t) : {};
 }
 
 /* ---------- Dashboard ---------- */

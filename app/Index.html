@@ -339,14 +339,6 @@ a.btn{text-decoration:none}
       </div>
       <button class="btn" id="cpSave"><span data-t="change_pin"></span></button>
     </div>
-    <div class="card" id="updCard" hidden><h3 data-t="upd_title"></h3>
-      <p id="updInfo" style="margin-bottom:10px"></p>
-      <button class="btn sec" id="updCheck"><span data-t="upd_check"></span></button>
-      <div class="pair" id="updConfirm" hidden>
-        <button class="btn sec" id="updNo"><span data-t="cancel"></span></button>
-        <button class="btn" id="updYes"><span data-t="upd_now"></span></button>
-      </div>
-    </div>
     <button class="btn danger" id="logoutBtn"><span data-t="logout"></span></button>
   </div>
 
@@ -433,15 +425,7 @@ en: {
   rep_lang_note:'The PDF is made in the language you are using now.',
   wa_tap:'{x} – wage statement', wa_biz:'Rubber estate – business statement',
   err_bad_range:'"From" date must be before "To" date', err_no_tapper:'Pick a tapper',
-  err_pdf_fail:'Could not create the PDF. Please try again.',
-  upd_title:'App updates', upd_check:'Check for updates', upd_checking:'Checking…', upd_now:'Update now',
-  upd_working:'Updating… (about 20 seconds)', upd_current:'Installed version: {x}', upd_latest:'You have the latest version.',
-  upd_avail:'New version {x} is ready.', upd_done:'Updated to {x}. Close the app fully and open it again.',
-  err_upd_fetch:'Could not reach GitHub. Try again in a minute.',
-  err_upd_bad:'The update files look incomplete, so nothing was changed.',
-  err_upd_api:'Turn on "Google Apps Script API" at script.google.com/home/usersettings, then try again.',
-  err_upd_scope:'The app needs permission to update itself. Run "setup" once in the Apps Script editor.',
-  err_upd_fail:'Update failed (error {x}). The app was not changed. Try again.'
+  err_pdf_fail:'Could not create the PDF. Please try again.'
 },
 ml: {
   app:'റബ്ബർ എസ്റ്റേറ്റ്', nav_home:'ഹോം', nav_tap:'ടാപ്പിംഗ്', nav_work:'പണികൾ', nav_sale:'വിൽപ്പന', nav_pay:'കൂലി', nav_set:'സെറ്റിംഗ്',
@@ -487,15 +471,7 @@ ml: {
   rep_lang_note:'ഇപ്പോൾ ഉപയോഗിക്കുന്ന ഭാഷയിൽ PDF തയ്യാറാകും.',
   wa_tap:'{x} – കൂലി സ്റ്റേറ്റ്മെന്റ്', wa_biz:'റബ്ബർ എസ്റ്റേറ്റ് – ബിസിനസ് സ്റ്റേറ്റ്മെന്റ്',
   err_bad_range:'"മുതൽ" തീയതി "വരെ" തീയതിക്ക് മുമ്പായിരിക്കണം', err_no_tapper:'ടാപ്പറെ തിരഞ്ഞെടുക്കുക',
-  err_pdf_fail:'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.',
-  upd_title:'ആപ്പ് അപ്ഡേറ്റ്', upd_check:'അപ്ഡേറ്റ് ഉണ്ടോ എന്ന് നോക്കുക', upd_checking:'നോക്കുന്നു…', upd_now:'ഇപ്പോൾ അപ്ഡേറ്റ് ചെയ്യുക',
-  upd_working:'അപ്ഡേറ്റ് ചെയ്യുന്നു… (ഏകദേശം 20 സെക്കൻഡ്)', upd_current:'ഇപ്പോഴത്തെ പതിപ്പ്: {x}', upd_latest:'ഏറ്റവും പുതിയ പതിപ്പാണ്.',
-  upd_avail:'പുതിയ പതിപ്പ് {x} തയ്യാർ.', upd_done:'{x} ലേക്ക് അപ്ഡേറ്റ് ചെയ്തു. ആപ്പ് പൂർണ്ണമായി അടച്ച് വീണ്ടും തുറക്കുക.',
-  err_upd_fetch:'GitHub ലഭ്യമല്ല. ഒരു മിനിറ്റ് കഴിഞ്ഞ് ശ്രമിക്കുക.',
-  err_upd_bad:'അപ്ഡേറ്റ് ഫയലുകൾ പൂർണ്ണമല്ല, ഒന്നും മാറ്റിയിട്ടില്ല.',
-  err_upd_api:'script.google.com/home/usersettings ൽ "Google Apps Script API" ഓൺ ചെയ്ത് വീണ്ടും ശ്രമിക്കുക.',
-  err_upd_scope:'അപ്ഡേറ്റിന് അനുമതി വേണം. Apps Script എഡിറ്ററിൽ "setup" ഒരിക്കൽ റൺ ചെയ്യുക.',
-  err_upd_fail:'അപ്ഡേറ്റ് പരാജയപ്പെട്ടു (പിശക് {x}). വീണ്ടും ശ്രമിക്കുക.'
+  err_pdf_fail:'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.'
 }};
 const CATS = ['Grass cutting', 'Fertiliser', 'Weeding', 'Spraying', 'Rain guarding', 'Other'];
 const SHEET_OF = { tap: 'Tapping', work: 'Work', sale: 'Sales', pay: 'Payments' };
@@ -864,33 +840,8 @@ function drawAccount() {
   $('av2').textContent = initials(APP.user.name);
   $('meName').textContent = APP.user.name;
   $('meSub').textContent = '@' + APP.user.username + ' · ' + t(isAdmin() ? 'admin' : 'member');
-  $('updCard').hidden = !isAdmin();
-  drawUpdate();
 }
 
-/* ---- app updates (admin) ---- */
-let upd = null;   // result of the last check
-function drawUpdate() {
-  const lines = [];
-  if (upd) lines.push(t('upd_current', upd.current));
-  if (upd && upd.done) lines.push(t('upd_done', upd.done));
-  else if (upd) lines.push(upd.newer ? t('upd_avail', upd.latest) + (upd.notes ? ' ' + upd.notes : '') : t('upd_latest'));
-  $('updInfo').textContent = lines.join(' ');
-  $('updInfo').hidden = !lines.length;
-  $('updConfirm').hidden = !(upd && upd.newer && !upd.done);
-  $('updCheck').hidden = !!(upd && upd.newer && !upd.done);
-}
-$('updCheck').onclick = async function () {
-  const s = this.querySelector('span'); this.disabled = true; s.textContent = t('upd_checking');
-  try { upd = await call('checkUpdate'); drawUpdate(); } catch (e) { toast(errMsg(e), true); }
-  this.disabled = false; s.textContent = t('upd_check');
-};
-$('updNo').onclick = () => { upd = null; drawUpdate(); };
-$('updYes').onclick = async function () {
-  const s = this.querySelector('span'); this.disabled = true; $('updNo').disabled = true; s.textContent = t('upd_working');
-  try { upd.done = await call('applyUpdate'); drawUpdate(); } catch (e) { toast(errMsg(e), true); }
-  this.disabled = false; $('updNo').disabled = false; s.textContent = t('upd_now');
-};
 $('cpSave').onclick = async function () {
   this.disabled = true;
   try {
